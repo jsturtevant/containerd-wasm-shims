@@ -47,6 +47,10 @@ build-slight-cross-%: install-cross
 
 .PHONY: build-spin
 build-spin:
+#choco install openssl -y
+#$env:OPENSSL_NO_VENDOR="true"  
+#$env:OPENSSL_DIR = "C:\Program Files\OpenSSL-Win64\"
+#choco install cmake -y #don't forget to add to path C:\Program Files\CMake\bin
 	cargo build --release --manifest-path=containerd-shim-spin-v1/Cargo.toml
 
 .PHONY: build-slight

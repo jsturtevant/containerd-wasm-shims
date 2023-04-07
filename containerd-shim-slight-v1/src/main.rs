@@ -12,6 +12,7 @@ use containerd_shim_wasm::sandbox::error::Error;
 use containerd_shim_wasm::sandbox::instance::EngineGetter;
 use containerd_shim_wasm::sandbox::oci;
 use containerd_shim_wasm::sandbox::Instance;
+use containerd_shim_wasm::sandbox::oci::Spec;
 use containerd_shim_wasm::sandbox::{instance::InstanceConfig, ShimCli};
 use log::info;
 
@@ -26,13 +27,15 @@ pub struct Wasi {
     stdout: String,
     stderr: String,
     bundle: String,
+    spec: Spec,
     shutdown_signal: Arc<(Mutex<bool>, Condvar)>,
 }
 
-pub fn prepare_module(bundle: String) -> Result<(PathBuf, PathBuf), Error> {
-    let mut spec = oci::load(Path::new(&bundle).join("config.json").to_str().unwrap())
-        .expect("unable to load OCI bundle");
+pub fn prepare_module(spec: Spec, bundle: String) -> Result<(PathBuf, PathBuf), Error> {
+    // let mut spec = oci::load(Path::new(&bundle).join("config.json").to_str().unwrap())
+    //     .expect("unable to load OCI bundle");
 
+    let mut spec = spec.clone();
     spec.canonicalize_rootfs(&bundle)
         .map_err(|err| Error::Others(format!("could not canonicalize rootfs: {err}")))?;
 
@@ -70,6 +73,7 @@ impl Instance for Wasi {
             stdout: cfg.get_stdout().unwrap(),
             stderr: cfg.get_stderr().unwrap(),
             bundle: cfg.get_bundle().unwrap_or_default(),
+            spec: cfg.get_spec().unwrap(),
             shutdown_signal: Arc::new((Mutex::new(false), Condvar::new())),
         }
     }
@@ -83,11 +87,12 @@ impl Instance for Wasi {
         let pod_stdin = self.stdin.clone();
         let pod_stdout = self.stdout.clone();
         let pod_stderr = self.stderr.clone();
+        let pod_spec = self.spec.clone();
 
         thread::Builder::new()
             .name(self.id.clone())
             .spawn(move || {
-                let (wasm_path, mod_path) = match prepare_module(bundle) {
+                let (wasm_path, mod_path) = match prepare_module(pod_spec, bundle) {
                     Ok(f) => f,
                     Err(err) => {
                         tx.send(Err(err)).unwrap();
