@@ -22,7 +22,7 @@ wasmtime = "5.0"
 toml = "0.7"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing = { version = "0.1", features = ["log"] }
-slight = { git = "https://github.com/deislabs/spiderlightning", version = "0.4.0" }
+slight = { path = "../../spiderlightning" }
 openssl = { version = "0.10", features = ["vendored"] }
 
 [dependencies.openssl-sys]

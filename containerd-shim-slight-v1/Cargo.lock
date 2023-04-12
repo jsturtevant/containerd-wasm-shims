@@ -4248,8 +4248,7 @@ checksum = "03b634d87b960ab1a38c4fe143b508576f075e7c978bfad18217645ebfdfa2ec"
 
 [[package]]
 name = "slight"
-version = "0.4.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "as-any",
@@ -4278,7 +4277,6 @@ dependencies = [
 [[package]]
 name = "slight-common"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "as-any",
@@ -4289,8 +4287,7 @@ dependencies = [
 
 [[package]]
 name = "slight-core"
-version = "0.4.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -4304,7 +4301,6 @@ dependencies = [
 [[package]]
 name = "slight-distributed-locking"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4321,7 +4317,6 @@ dependencies = [
 [[package]]
 name = "slight-http-api"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4334,7 +4329,6 @@ dependencies = [
 [[package]]
 name = "slight-http-client"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4347,7 +4341,6 @@ dependencies = [
 [[package]]
 name = "slight-http-server"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "crossbeam-channel",
@@ -4368,7 +4361,6 @@ dependencies = [
 [[package]]
 name = "slight-keyvalue"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4391,7 +4383,6 @@ dependencies = [
 [[package]]
 name = "slight-messaging"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "async-channel",
@@ -4416,7 +4407,6 @@ dependencies = [
 [[package]]
 name = "slight-runtime"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "as-any",
@@ -4434,7 +4424,6 @@ dependencies = [
 [[package]]
 name = "slight-runtime-configs"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4453,7 +4442,6 @@ dependencies = [
 [[package]]
 name = "slight-sql"
 version = "0.1.0"
-source = "git+https://github.com/deislabs/spiderlightning#d49b1ccde1ba27d2e93e791c8d40a80f6986fc8b"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -5153,7 +5141,6 @@ checksum = "3528ecfd12c466c6f163363caf2d02a71161dd5e1cc6ae7b34207ea2d42d81ed"
 [[package]]
 name = "ttrpc"
 version = "0.7.1"
-source = "git+https://github.com/containerd/ttrpc-rust?branch=master#ebbb58e66bfabb55bf0bde90d6726c787efbbab8"
 dependencies = [
  "byteorder",
  "libc",

@@ -37,7 +37,7 @@ pub fn prepare_module(spec: Spec, bundle: String) -> Result<(PathBuf, PathBuf), 
 
     let mut spec = spec.clone();
     spec.canonicalize_rootfs(&bundle)
-        .map_err(|err| Error::Others(format!("could not canonicalize rootfs: {err}")))?;
+    .map_err(|err| Error::Others(format!("could not canonicalize rootfs: {err}")))?;
 
     let working_dir = oci::get_root(&spec);
 
@@ -114,6 +114,8 @@ impl Instance for Wasi {
                         }
                     });
 
+                    info!(" >>> working dir:");
+                    info!(" >>> {:?}", std::env::current_dir().unwrap());
                     let args = RunArgs {
                         module: wasm_path,
                         slightfile: PathBuf::from(&mod_path),

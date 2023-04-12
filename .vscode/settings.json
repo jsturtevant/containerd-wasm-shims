@@ -1,0 +1,6 @@
+{
+    "rust-analyzer.cargo.extraEnv": {
+        "OPENSSL_NO_VENDOR": "true",
+        "OPENSSL_DIR": "C:\\Program Files\\OpenSSL-Win64\\"
+    }
+}

@@ -133,6 +133,19 @@ docker buildx build --platform=wasi/wasm -t localhost:12345/qs-wasm-slight .
 docker push localhost:12345/qs-wasm-slight:latest
 ```
 
+To build the image for use on Windows use `Dockerfile.windows`.  Buildx is not supported on Windows so this must be run on Linux:
+
+```
+docker buildx create --name img-builder --use --platform windows/amd64
+docker buildx build --platform windows/amd64 -t localhost:12345/qs-wasm-slight -f Dockerfile.windows -o type=docker,dest=image-slight.tar .
+```
+
+On Windows import the image:
+
+```
+.\ctr.exe image import --platform=windows/wasm .\img-slight.tar
+```
+
 ## Deploy the application
 
 Create a `qs.yaml` file with the following:

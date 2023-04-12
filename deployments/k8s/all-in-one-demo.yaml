@@ -33,7 +33,7 @@ spec:
       runtimeClassName: wasmtime-slight-v1
       containers:
         - name: testwasm
-          image: ghcr.io/deislabs/containerd-wasm-shims/examples/slight-rust-hello:latest
+          image: docker.io/jsturtevant/qs-wasm-slight:latest
           command: ["/"]
 ---
 apiVersion: v1
