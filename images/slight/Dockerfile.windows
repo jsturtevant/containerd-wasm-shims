@@ -1,9 +1,10 @@
-FROM --platform=wasi/wasm rust:1.64 AS build
+FROM --platform=${BUILDPLATFORM} rust:1.64 AS build
 WORKDIR /opt/build
 COPY . .
 RUN rustup target add wasm32-wasi && cargo build --target wasm32-wasi --release
-RUN cp /opt/build/target/wasm32-wasi/release/http_server_lib.wasm /app
-RUN cp /opt/build/slightfile.toml /app
+WORKDIR /app
+RUN cp /opt/build/target/wasm32-wasi/release/http_server_lib.wasm ./app.wasm
+RUN cp /opt/build/slightfile.toml ./
 
-FROM --platform=windows/amd64 mcr.microsoft.com/oss/kubernetes/windows-host-process-containers-base-image:v1.0.0
-COPY --from=build /app/ ./
+FROM mcr.microsoft.com/oss/kubernetes/windows-host-process-containers-base-image:v1.0.0
+COPY --from=build /app ./
