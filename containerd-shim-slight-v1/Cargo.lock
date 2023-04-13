@@ -1095,7 +1095,7 @@ dependencies = [
  "log",
  "mio",
  "nix 0.26.2",
- "oci-spec",
+ "oci-spec 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "page_size",
  "prctl",
  "regex",
@@ -1152,7 +1152,7 @@ dependencies = [
  "libc",
  "log",
  "nix 0.26.2",
- "oci-spec",
+ "oci-spec 0.6.0",
  "proc-mounts",
  "protobuf 3.2.0",
  "serde",
@@ -2983,6 +2983,17 @@ dependencies = [
  "hashbrown",
  "indexmap",
  "memchr",
+]
+
+[[package]]
+name = "oci-spec"
+version = "0.6.0"
+dependencies = [
+ "derive_builder",
+ "getset",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
