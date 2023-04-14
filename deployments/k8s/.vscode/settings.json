@@ -1,0 +1,5 @@
+{
+    "yaml.schemas": {
+        "kubernetes://schema/apps/v1%40daemonset": "file:///c%3A/Users/jstur/projects/containerd-wasm-shims/deployments/k8s/installer.yaml"
+    }
+}

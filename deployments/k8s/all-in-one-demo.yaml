@@ -1,27 +1,18 @@
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: "wasmtime-slight-v1"
-handler: "slight"
+  name: wasmtime-slight
+handler: slight
 scheduling:
   nodeSelector:
-    "kubernetes.azure.com/wasmtime-slight-v1": "true"
----
-apiVersion: node.k8s.io/v1
-kind: RuntimeClass
-metadata:
-  name: "wasmtime-spin-v1"
-handler: "spin"
-scheduling:
-  nodeSelector:
-    "kubernetes.azure.com/wasmtime-spin-v1": "true"
+    wasm/wasmtime-slight-v1: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wasm-slight
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
       app: wasm-slight
@@ -30,11 +21,18 @@ spec:
       labels:
         app: wasm-slight
     spec:
-      runtimeClassName: wasmtime-slight-v1
+      runtimeClassName: wasmtime-slight
       containers:
-        - name: testwasm
-          image: docker.io/jsturtevant/qs-wasm-slight:latest
+        - name: hello-slight
+          image:  docker.io/jsturtevant/qs-wasm-slight:all-in-one
           command: ["/"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 10Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
 ---
 apiVersion: v1
 kind: Service
@@ -49,35 +47,3 @@ spec:
   selector:
     app: wasm-slight
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: wasm-spin
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: wasm-spin
-  template:
-    metadata:
-      labels:
-        app: wasm-spin
-    spec:
-      runtimeClassName: wasmtime-spin-v1
-      containers:
-        - name: testwasm
-          image: ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:latest
-          command: ["/"]
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: wasm-spin
-spec:
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  selector:
-    app: wasm-spin
-  type: LoadBalancer

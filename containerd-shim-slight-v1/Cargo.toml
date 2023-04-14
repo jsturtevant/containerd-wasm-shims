@@ -33,5 +33,3 @@ version = "1.7"
 
 [dependencies.curl]
 features = ["zlib-ng-compat"]
-
-[workspace]

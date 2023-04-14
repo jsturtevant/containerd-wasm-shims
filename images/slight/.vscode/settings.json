@@ -1,0 +1,7 @@
+{
+    "rust-analyzer.cargo.extraEnv": {
+        "OPENSSL_NO_VENDOR": "true",
+        "OPENSSL_DIR": "C:\\Program Files\\OpenSSL-Win64\\"
+    },
+    "rust-analyzer.cargo.features": ["oci-v1-tar"]
+}

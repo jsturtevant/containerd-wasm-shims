@@ -1,0 +1,189 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: amd-installer
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: amd-installer
+  template:
+    metadata:
+      labels:
+        app: amd-installer
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+        kubernetes.io/arch: amd64
+      containers:
+      - name: curl
+        image: curlimages/curl:8.00.1
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            curl -L https://github.com/jsturtevant/containerd-wasm-shims/releases/download/dev/containerd-shim-slight-v1 -o /tmp/containerd-shim-slight-v1
+            chmod +x /tmp/containerd-shim-slight-v1
+            mv /tmp/containerd-shim-slight-v1 /host-files/usr/local/bin/
+            sleep 3600
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+        volumeMounts:
+        - name: host-files
+          mountPath: /host-files
+      volumes:
+      - name: host-files
+        hostPath:
+          path: /
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: arm-installer
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: arm-installer
+  template:
+    metadata:
+      labels:
+        app: arm-installer
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+        kubernetes.io/arch: arm64
+      containers:
+      - name: curl
+        image: curlimages/curl:8.00.1
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            curl -L https://github.com/jsturtevant/containerd-wasm-shims/releases/download/dev/containerd-shim-slight-v1-arm -o /tmp/containerd-shim-slight-v1
+            chmod +x /tmp/containerd-shim-slight-v1
+            mv /tmp/containerd-shim-slight-v1 /host-files/usr/local/bin/
+            sleep 3600
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+        volumeMounts:
+        - name: host-files
+          mountPath: /host-files
+      volumes:
+      - name: host-files
+        hostPath:
+          path: /
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: windows-installer
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: windows-installer
+  template:
+    metadata:
+      labels:
+        name: windows-installer
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/os: windows
+      securityContext:
+        windowsOptions:
+          hostProcess: true
+          runAsUserName: "NT AUTHORITY\\system"
+      containers:
+      - name: hostprocess-container
+        image: mcr.microsoft.com/windows/nanoserver:ltsc2022
+        command: ["powershell.exe"]
+        args: ["-command", "curl.exe -LO https://github.com/jsturtevant/containerd-wasm-shims/releases/download/dev/containerd-shim-slight-v1.exe; mv -force ./containerd-shim-slight-v1.exe \"c:\\Program Files\\containerd\\containerd-shim-slight-v1.exe\";  mv -force ./config/containerd.config \"c:\\Program Files\\containerd\\config.toml\"; Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')); choco install openssl -y; start-sleep -seconds 3600;"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: containerd-config
+--- 
+apiVersion: v1
+data:
+  containerd.config: |
+    root = "C:\\ProgramData\\containerd\\root"
+    state = "C:\\ProgramData\\containerd\\state"
+
+    [grpc]
+      address = "\\\\.\\pipe\\containerd-containerd"
+      max_recv_message_size = 16777216
+      max_send_message_size = 16777216
+
+    [ttrpc]
+      address = ""
+
+    [debug]
+      address = ""
+      level = "trace"
+
+    [metrics]
+      address = "0.0.0.0:10257"
+      grpc_histogram = false
+
+    [cgroup]
+      path = ""
+
+    [plugins]
+      [plugins.cri]
+        stream_server_address = "127.0.0.1"
+        stream_server_port = "0"
+        enable_selinux = false
+        sandbox_image = "mcr.microsoft.com/oss/kubernetes/pause:3.9-windows-ltsc2022-amd64"
+        stats_collect_period = 10
+        systemd_cgroup = false
+        enable_tls_streaming = false
+        max_container_log_line_size = 16384
+        disable_http2_client = false
+        [plugins.cri.containerd]
+          snapshotter = "windows"
+          discard_unpacked_layers = true
+          no_pivot = false
+          [plugins.cri.containerd.default_runtime]
+            runtime_type = "io.containerd.runhcs.v1"
+            [plugins.cri.containerd.default_runtime.options]
+              Debug = false
+              DebugType = 0
+              SandboxImage = "mcr.microsoft.com/oss/kubernetes/pause:3.9-windows-ltsc2022-amd64"
+              SandboxPlatform = "windows/amd64"
+              SandboxIsolation = 0
+          [plugins.cri.containerd.runtimes]
+            [plugins.cri.containerd.runtimes.slight]
+              runtime_type = "io.containerd.slight.v1"
+            [plugins.cri.containerd.runtimes.runhcs-wcow-process]
+              runtime_type = "io.containerd.runhcs.v1"
+              [plugins.cri.containerd.runtimes.runhcs-wcow-process.options]
+                Debug = true
+                DebugType = 2
+                SandboxImage = "mcr.microsoft.com/oss/kubernetes/pause:3.9-windows-ltsc2022-amd64"
+                SandboxPlatform = "windows/amd64"
+        [plugins.cri.cni]
+          bin_dir = "c:/k/azurecni/bin"
+          conf_dir = "c:/k/azurecni/netconf"
+        [plugins.cri.registry]
+          [plugins.cri.registry.mirrors]
+            [plugins.cri.registry.mirrors."docker.io"]
+              endpoint = ["https://registry-1.docker.io"]
+      [plugins.diff-service]
+        default = ["windows"]
+      [plugins.scheduler]
+        pause_threshold = 0.02
+        deletion_threshold = 0
+        mutation_threshold = 100
+        schedule_delay = "0s"
+        startup_delay = "100ms"
+kind: ConfigMap
+metadata:
+  name: containerd-config
+  namespace: kube-system
