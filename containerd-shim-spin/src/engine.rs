@@ -1,5 +1,5 @@
 use anyhow::{anyhow, ensure, Context, Result};
-use containerd_shim_wasm::container::{Engine, RuntimeContext, Stdio};
+use containerd_shim_wasm::container::{Engine, RuntimeContext, Source, Stdio};
 use log::info;
 use oci_spec::image::MediaType;
 use spin_app::locked::LockedApp;
@@ -64,14 +64,16 @@ impl std::fmt::Debug for AppSource {
 
 impl SpinEngine {
     async fn app_source(&self, ctx: &impl RuntimeContext, cache: &Cache) -> Result<AppSource> {
-        match ctx.wasm_layers() {
-            [] => Ok(AppSource::File(
+        
+        
+        match ctx.entrypoint().source {
+            Source::File(_) => Ok(AppSource::File(
                 spin_common::paths::resolve_manifest_file_path("/spin.toml")?,
             )),
-            layers => {
+            Source::Oci(layers) => {
                 info!(
                     " >>> configuring spin oci application {}",
-                    ctx.wasm_layers().len()
+                    layers.len()
                 );
 
                 for artifact in layers {
@@ -262,6 +264,22 @@ impl Engine for SpinEngine {
 
     fn can_handle(&self, _ctx: &impl RuntimeContext) -> Result<()> {
         Ok(())
+    }
+
+    fn supported_layers_types() -> &'static [&'static str] {
+        info!("supported layers called");
+        &["application/vnd.fermyon.spin.application.v1+config", 
+        "application/vnd.wasm.content.layer.v1+wasm"]
+    }
+
+    fn can_precompile(&self) -> Option<String> {
+        Some("2.0.1".to_string())
+    }
+
+    fn precompile(&self, layer: &containerd_shim_wasm::sandbox::WasmLayer) -> Option<Result<Vec<u8>>> {
+        // TODO: do compilation here based on media type
+        log::info!("{}", layer.config.media_type().to_string());
+        Some(Ok(layer.layer.clone()))
     }
 }
 
